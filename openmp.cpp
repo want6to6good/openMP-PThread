@@ -4,7 +4,7 @@
 #include<sys/time.h>
 #include<immintrin.h>  // AVX
 #include<pthread.h>  // pthread
-#include<semaphore.h>  // ĞÅºÅÁ¿
+#include<semaphore.h>  // ä¿¡å·é‡
 #include<mutex>
 #include<condition_variable>
 #include<omp.h>
@@ -25,19 +25,19 @@ typedef struct
 }PT_EliminationParam;
 typedef struct
 {
-	int t_id; //Ïß³Ì id
+	int t_id; //çº¿ç¨‹ id
 }PT_StaticParam;
-//ĞÅºÅÁ¿¶¨Òå
+//ä¿¡å·é‡å®šä¹‰
 sem_t sem_main;
 sem_t sem_workerstart[THREAD_NUM];
 sem_t sem_workerend[THREAD_NUM];
 sem_t sem_leader;
 sem_t sem_Divsion[THREAD_NUM - 1];
 sem_t sem_Elimination[THREAD_NUM - 1];
-//barrier¶¨Òå
+//barrierå®šä¹‰
 pthread_barrier_t barrier_Divsion;
 pthread_barrier_t barrier_Elimination;
-//Ìõ¼ş±äÁ¿ºÍ»¥³âËø¶¨Òå
+//æ¡ä»¶å˜é‡å’Œäº’æ–¥é”å®šä¹‰
 mutex _mutex;
 condition_variable _cond;
 
@@ -119,7 +119,7 @@ void C_GE_OMP_Dynamic(float** a, int n)
 		}
 	}
 }
-// ¸ßË¹ÏûÈ¥Ëã·¨µÄCacheÓÅ»¯°æ±¾ _OMP
+// é«˜æ–¯æ¶ˆå»ç®—æ³•çš„Cacheä¼˜åŒ–ç‰ˆæœ¬ _OMP
 void C_GE_OMP_Static(float** a, int n)
 {
 	float t1, t2; 
@@ -142,7 +142,7 @@ void C_GE_OMP_Static(float** a, int n)
 		}
 	}
 }
-// Ê¹ÓÃAVXÖ¸Áî¼¯½øĞĞSIMDÓÅ»¯µÄ¸ßË¹ÏûÈ¥Ëã·¨
+// ä½¿ç”¨AVXæŒ‡ä»¤é›†è¿›è¡ŒSIMDä¼˜åŒ–çš„é«˜æ–¯æ¶ˆå»ç®—æ³•
 void C_GE_OMP_Dynamic_AVX(float** a, int n)
 {
 	__m256 va, vt, vaik, vakj, vaij, vx;
@@ -186,7 +186,7 @@ void C_GE_OMP_Dynamic_AVX(float** a, int n)
 #pragma omp barrier
 	}
 }
-// Ê¹ÓÃAVXÖ¸Áî¼¯½øĞĞSIMDÓÅ»¯µÄ¸ßË¹ÏûÈ¥Ëã·¨
+// ä½¿ç”¨AVXæŒ‡ä»¤é›†è¿›è¡ŒSIMDä¼˜åŒ–çš„é«˜æ–¯æ¶ˆå»ç®—æ³•
 void C_GE_OMP_Static_AVX(float** a, int n)
 {
 	__m256 va, vt, vaik, vakj, vaij, vx;
@@ -243,41 +243,41 @@ int main()
 	GE(m1, n);
 	gettimeofday(&end, NULL);
 	cout << endl << endl << endl;
-	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//Î¢Ãë
+	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//å¾®ç§’
 	cout << "GE: " << time_use / 1000 << "ms" << endl;
 
 	float** m2 = generate(n);
 	gettimeofday(&start, NULL);
 	C_GE(m2, n);
 	gettimeofday(&end, NULL);
-	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//Î¢Ãë
+	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//å¾®ç§’
 	cout << "C_GE: " << time_use / 1000 << "ms" << endl;
 
 	m2 = generate(n);
 	gettimeofday(&start, NULL);
 	C_GE_OMP_Dynamic(m2, n);
 	gettimeofday(&end, NULL);
-	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//Î¢Ãë
+	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//å¾®ç§’
 	cout << "C_GE_OMP_Dynamic: " << time_use / 1000 << "ms" << endl;
 
 	m2 = generate(n);
 	gettimeofday(&start, NULL);
 	C_GE_OMP_Static(m2, n);
 	gettimeofday(&end, NULL);
-	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//Î¢Ãë
+	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//å¾®ç§’
 	cout << "C_GE_OMP_Static: " << time_use / 1000 << "ms" << endl;
 
 	m2 = generate(n);
 	gettimeofday(&start, NULL);
 	C_GE_OMP_Dynamic_AVX(m2, n);
 	gettimeofday(&end, NULL);
-	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//Î¢Ãë
+	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//å¾®ç§’
 	cout << "C_GE_OMP_Dynamic_AVX: " << time_use / 1000 << "ms" << endl;
 
 	m2 = generate(n);
 	gettimeofday(&start, NULL);
 	C_GE_OMP_Static_AVX(m2, n);
 	gettimeofday(&end, NULL);
-	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//Î¢Ãë
+	time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec);//å¾®ç§’
 	cout << "C_GE_OMP_Static_AVX: " << time_use / 1000 << "ms" << endl;
 }
